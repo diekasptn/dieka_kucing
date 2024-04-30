@@ -82,4 +82,20 @@ class Cats013_model extends CI_Model {
 		$query=$this->db->get('catsales013');
         return $query->result();
 	}
+
+    public function changephoto ($file,$id){
+        $this->db->select('photo_cats_013');
+        $this->db->from('cats013');
+        $this->db->where('id_013', $id);
+        $query = $this->db->get();
+        $photo = $query->row()->photo_cats;
+
+        if($photo != 'default.png'){
+        unlink('uploads/cats/'.$photo);
+
+        $this->db->set('photo_cats_013', $file);
+        $this->db->where('id_013',$id);
+        return $this->db->update('cats013');
+        }
+    }
 }
