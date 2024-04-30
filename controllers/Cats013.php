@@ -93,4 +93,40 @@ class Cats013 extends CI_Controller {
 		$data['sales']=$this->Cats013_model->sales();
 		$this->load->view('cats013/sale_list_013',$data);
 	}
+
+	public function changephoto($id)
+    {
+        if (!$this->session->userdata('username'))
+            redirect('auth045/login'); //filter LOGIN
+    
+        // Load the cat data by id
+        $data['cat'] = $this->Cats013_model->read_by($id);
+    
+        if ($this->input->post('upload')) {
+            if ($this->upload()) { // Jika upload berhasil
+                $this->Cats013_model->changephoto($this->upload->data('file_name'), $id); // Ubah data foto di DB
+                $this->session->set_userdata('photo', $this->upload->data('file_name')); // Perbarui data session dengan URL foto yang baru diunggah
+                $this->session->set_flashdata('msg', '<p style="color:lime">Photo successfully changed!</p>'); // Pesan sukses
+    
+                redirect('cats013'); // Redirect ke halaman daftar kucing setelah berhasil mengunggah foto
+            } else {
+                $data['error'] = $this->upload->display_errors(); // Jika upload gagal
+            }
+        }
+        // Jika belum submit form, tampilkan halaman upload foto
+        $this->load->view('cats013/cat_form_photo_013', $data);
+    }
+    
+
+    public function upload()
+    {
+        $config['upload_path'] = './uploads/cats/';
+        $config['allowed_types'] = 'gif|jpg|png|jpeg';
+        $config['max_size'] = 300;
+        $config['max_width'] = 1024;
+        $config['max_height'] = 768;
+
+        $this->load->library('upload', $config);
+        return $this->upload->do_upload('photo');
+    }
 }
